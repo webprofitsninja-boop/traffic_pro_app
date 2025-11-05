@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/lib/supabase';
+// We now call our Vercel API route instead of a Supabase Edge Function
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -27,14 +27,19 @@ export function CheckoutButton({ planName, planPrice, userId, email }: CheckoutB
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-        body: { planName, planPrice, userId, email }
-      });
+      const resp = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ planName, planPrice, userId, email })
+      })
 
-      if (error) throw error;
+      if (!resp.ok) throw new Error('Failed to create session')
 
+      const data = await resp.json()
       if (data.url) {
-        window.location.href = data.url;
+        window.location.href = data.url
+      } else {
+        throw new Error('Missing checkout url')
       }
     } catch (error) {
       toast({
