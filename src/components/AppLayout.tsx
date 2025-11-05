@@ -4,6 +4,7 @@ import { CampaignCard } from './CampaignCard';
 import { IntegrationCard } from './IntegrationCard';
 import { URLShortener } from './URLShortener';
 import { PricingCard } from './PricingCard';
+import { CheckoutButton } from './CheckoutButton';
 import { TrafficChart } from './TrafficChart';
 import { CampaignModal } from './CampaignModal';
 import { SubscriptionBanner } from './SubscriptionBanner';
@@ -183,7 +184,7 @@ export default function AppLayout() {
             price={29}
             period="month"
             features={['10,000 visitors/month', '5 campaigns', 'Basic analytics', 'Email support', '3 integrations']}
-            onSelect={() => alert('Starting Starter trial')}
+            cta={<CheckoutButton planName="Basic" planPrice={29} userId={user?.id} email={user?.email ?? undefined} />}
           />
           <PricingCard
             name="Professional"
@@ -191,14 +192,14 @@ export default function AppLayout() {
             period="month"
             popular
             features={['100,000 visitors/month', 'Unlimited campaigns', 'Advanced analytics', 'Priority support', 'All integrations', 'Custom domains', 'API access']}
-            onSelect={() => alert('Starting Professional trial')}
+            cta={<CheckoutButton planName="Pro" planPrice={99} userId={user?.id} email={user?.email ?? undefined} />}
           />
           <PricingCard
             name="Enterprise"
             price={299}
             period="month"
             features={['Unlimited visitors', 'Unlimited campaigns', 'Enterprise analytics', '24/7 dedicated support', 'All integrations', 'White label', 'Custom solutions']}
-            onSelect={() => alert('Starting Enterprise trial')}
+            cta={<CheckoutButton planName="Enterprise" planPrice={299} userId={user?.id} email={user?.email ?? undefined} />}
           />
         </div>
       </div>

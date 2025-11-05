@@ -7,10 +7,12 @@ interface PricingCardProps {
   period: string;
   features: string[];
   popular?: boolean;
-  onSelect: () => void;
+  onSelect?: () => void;
+  // Optional custom call-to-action element (e.g., a CheckoutButton)
+  cta?: React.ReactNode;
 }
 
-export const PricingCard: React.FC<PricingCardProps> = ({ name, price, period, features, popular, onSelect }) => {
+export const PricingCard: React.FC<PricingCardProps> = ({ name, price, period, features, popular, onSelect, cta }) => {
   return (
     <div className={`relative bg-white/5 backdrop-blur-lg rounded-xl p-8 border transition-all hover:transform hover:scale-105 ${
       popular ? 'border-purple-500 shadow-lg shadow-purple-500/20' : 'border-white/10'
@@ -33,9 +35,13 @@ export const PricingCard: React.FC<PricingCardProps> = ({ name, price, period, f
           </li>
         ))}
       </ul>
-      <button onClick={onSelect} className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all">
-        Get Started
-      </button>
+      {cta ? (
+        cta
+      ) : (
+        <button onClick={onSelect} className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all">
+          Get Started
+        </button>
+      )}
 
     </div>
   );
