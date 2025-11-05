@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /billing
+
+Sitemap: https://yourplatform.com/sitemap.xml
