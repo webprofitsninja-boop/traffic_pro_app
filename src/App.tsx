@@ -12,15 +12,8 @@ import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import { BillingPage } from "./components/BillingPage";
 import { Login } from "./components/auth/Login";
-// If the external ForgetPassword component is missing, use a simple placeholder component
-// (or replace this with the correct import path to your real component)
-const ForgetPassword: React.FC = () => {
-  return React.createElement("div", null, "Forgot password page");
-};
-
-const SignUp: React.FC = () => {
-  return React.createElement("div", null, "Sign up page");
-};
+import { SignUp } from "./components/auth/SignUp";
+import { ForgotPassword } from "./components/auth/ForgotPassword";
 
 import { CampaignAnalytics } from "./pages/CampaignAnalytics";
 import LandingPage from "./components/LandingPage";
@@ -44,7 +37,7 @@ const App = () => {
               <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<SignUp />} />
-                <Route path="/forgot-password" element={<ForgetPassword />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
                 <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                 <Route path="/billing" element={<ProtectedRoute><BillingPage /></ProtectedRoute>} />
