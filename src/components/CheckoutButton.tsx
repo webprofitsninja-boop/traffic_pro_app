@@ -16,21 +16,21 @@ export function CheckoutButton({ planName, planPrice, userId, email }: CheckoutB
   const { toast } = useToast();
 
   const handleCheckout = async () => {
-    if (!userId || !email) {
-      toast({
-        title: 'Authentication Required',
-        description: 'Please sign in to subscribe',
-        variant: 'destructive'
-      });
-      return;
-    }
+    // DEMO MODE: Use demo values if user is not authenticated
+    const demoUserId = userId || 'demo-user-id';
+    const demoEmail = email || 'webprofitsninja@gmail.com';
 
     setLoading(true);
     try {
       const resp = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ planName, planPrice, userId, email })
+        body: JSON.stringify({ 
+          planName, 
+          planPrice, 
+          userId: demoUserId, 
+          email: demoEmail 
+        })
       })
 
       if (!resp.ok) throw new Error('Failed to create session')

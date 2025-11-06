@@ -5,8 +5,16 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
+// DEMO MODE: Allow access without authentication for testing
+const DEMO_MODE = true;
+
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
+
+  // Demo mode bypass
+  if (DEMO_MODE) {
+    return <>{children}</>;
+  }
 
   if (loading) {
     return (
