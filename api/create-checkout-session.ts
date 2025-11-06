@@ -8,9 +8,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 function getPriceIdForPlan(planName: string | undefined): string | null {
   if (!planName) return null
   const key = planName.trim().toLowerCase()
-  if (key.startsWith('basic')) return process.env.VITE_STRIPE_PRICE_BASIC || null
-  if (key.startsWith('advanced') || key.startsWith('pro')) return process.env.VITE_STRIPE_PRICE_ADVANCED || null
-  if (key.startsWith('enterprise')) return process.env.VITE_STRIPE_PRICE_ENTERPRISE || null
+  // Check both VITE_ prefixed (from Vercel env) and non-prefixed versions
+  if (key.startsWith('basic')) return process.env.VITE_STRIPE_PRICE_BASIC || process.env.STRIPE_PRICE_BASIC || null
+  if (key.startsWith('advanced') || key.startsWith('pro')) return process.env.VITE_STRIPE_PRICE_ADVANCED || process.env.STRIPE_PRICE_ADVANCED || null
+  if (key.startsWith('enterprise')) return process.env.VITE_STRIPE_PRICE_ENTERPRISE || process.env.STRIPE_PRICE_ENTERPRISE || null
   return null
 }
 
