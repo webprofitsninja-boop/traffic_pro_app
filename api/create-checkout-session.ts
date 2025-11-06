@@ -36,11 +36,16 @@ export default async function handler(
     const json = buffers.length ? JSON.parse(Buffer.concat(buffers).toString('utf8')) : {}
 
     const { planName, email } = json || {}
+    console.log('Received request:', { planName, email })
+    
     const priceId = getPriceIdForPlan(planName)
+    console.log('Resolved priceId:', priceId, 'for plan:', planName)
+    
     if (!priceId) {
+      console.error('No price ID found for plan:', planName)
       res.statusCode = 400
       res.setHeader('Content-Type', 'application/json')
-      res.end(JSON.stringify({ error: 'Invalid plan' }))
+      res.end(JSON.stringify({ error: `Invalid plan: ${planName}. No price ID configured.` }))
       return
     }
 
@@ -48,6 +53,8 @@ export default async function handler(
     const proto = (req.headers['x-forwarded-proto'] as string) || 'https'
     const origin = `${proto}://${host}`
 
+    console.log('Creating Stripe session with priceId:', priceId)
+    
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
@@ -67,8 +74,9 @@ export default async function handler(
     res.setHeader('Content-Type', 'application/json')
     res.end(JSON.stringify({ url: session.url }))
   } catch (err: any) {
+    console.error('Error in create-checkout-session:', err)
     res.statusCode = 500
     res.setHeader('Content-Type', 'application/json')
-    res.end(JSON.stringify({ error: err.message || 'Internal Server Error' }))
+    res.end(JSON.stringify({ error: err.message || 'Internal Server Error', details: err.toString() }))
   }
 }
