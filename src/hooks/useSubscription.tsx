@@ -38,11 +38,46 @@ export function useSubscription() {
   const { user } = useAuth();
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
+  
+  // Owner override: grant Enterprise access without payment when email matches
+  // Configure in Vercel (and local .env): VITE_OWNER_EMAILS="owner@example.com,other@domain.com"
+  const ownerEmails = (import.meta.env.VITE_OWNER_EMAILS as string | undefined)?.split(',')
+    .map(e => e.trim().toLowerCase())
+    .filter(Boolean) || [];
 
   useEffect(() => {
-    if (user) {
-      fetchSubscription();
+    if (!user) {
+      setSubscription(null);
+      setLoading(false);
+      return;
     }
+
+    const email = (user.email || '').toLowerCase();
+    const isOwner = !!email && ownerEmails.includes(email);
+
+    if (isOwner) {
+      // Synthesize an active Enterprise subscription for the owner
+      const now = new Date();
+      const end = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // +30 days
+      const synthetic: Subscription = {
+        id: 'synthetic-owner-sub',
+        user_id: user.id,
+        stripe_subscription_id: 'synthetic',
+        stripe_customer_id: 'synthetic',
+        plan_name: 'enterprise',
+        status: 'active',
+        current_period_start: now.toISOString(),
+        current_period_end: end.toISOString(),
+        trial_end: null,
+        cancel_at_period_end: false,
+        created_at: now.toISOString(),
+      };
+      setSubscription(synthetic);
+      setLoading(false);
+      return;
+    }
+
+    fetchSubscription();
   }, [user]);
 
   const fetchSubscription = async () => {

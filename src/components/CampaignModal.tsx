@@ -4,14 +4,28 @@ interface CampaignModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: any) => void;
+  campaign?: any; // For editing existing campaigns
 }
 
-export const CampaignModal: React.FC<CampaignModalProps> = ({ isOpen, onClose, onSubmit }) => {
+export const CampaignModal: React.FC<CampaignModalProps> = ({ isOpen, onClose, onSubmit, campaign }) => {
   const [formData, setFormData] = useState({
     name: '',
     budget: '',
     platform: 'google'
   });
+
+  // Update form when campaign prop changes (for editing)
+  React.useEffect(() => {
+    if (campaign) {
+      setFormData({
+        name: campaign.name || '',
+        budget: campaign.spend?.toString() || '',
+        platform: 'google'
+      });
+    } else {
+      setFormData({ name: '', budget: '', platform: 'google' });
+    }
+  }, [campaign]);
 
   if (!isOpen) return null;
 
@@ -25,7 +39,9 @@ export const CampaignModal: React.FC<CampaignModalProps> = ({ isOpen, onClose, o
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50" onClick={onClose}>
       <div className="bg-[#1a1a2e] rounded-xl p-8 max-w-md w-full mx-4 border border-white/10" onClick={(e) => e.stopPropagation()}>
-        <h2 className="text-2xl font-bold text-white mb-6">Create New Campaign</h2>
+        <h2 className="text-2xl font-bold text-white mb-6">
+          {campaign ? 'Edit Campaign' : 'Create New Campaign'}
+        </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-gray-400 text-sm mb-2">Campaign Name</label>
@@ -64,7 +80,7 @@ export const CampaignModal: React.FC<CampaignModalProps> = ({ isOpen, onClose, o
               Cancel
             </button>
             <button type="submit" className="flex-1 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg transition-all">
-              Create
+              {campaign ? 'Save Changes' : 'Create'}
             </button>
           </div>
         </form>

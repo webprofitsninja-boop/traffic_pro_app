@@ -8,6 +8,7 @@ import { CheckoutButton } from './CheckoutButton';
 import { TrafficChart } from './TrafficChart';
 import { CampaignModal } from './CampaignModal';
 import { SubscriptionBanner } from './SubscriptionBanner';
+import { CheckoutSuccessBanner } from './CheckoutSuccessBanner';
 import { FeatureGate } from './FeatureGate';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,6 +18,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 export default function AppLayout() {
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingCampaign, setEditingCampaign] = useState<any>(null);
   const [campaigns, setCampaigns] = useState([
     { id: 1, name: 'Summer Sale 2025', status: 'active' as const, clicks: 15420, conversions: 342, spend: 1250 },
     { id: 2, name: 'Product Launch', status: 'active' as const, clicks: 8930, conversions: 178, spend: 890 },
@@ -41,21 +43,67 @@ export default function AppLayout() {
     setCampaigns(campaigns.map(c => c.id === id ? { ...c, status: c.status === 'active' ? 'paused' as const : 'active' as const } : c));
   };
 
+  const handleEditCampaign = (id: number) => {
+    const campaign = campaigns.find(c => c.id === id);
+    if (campaign) {
+      setEditingCampaign(campaign);
+      setModalOpen(true);
+    }
+  };
+
+  const handleSaveCampaign = (data: any) => {
+    if (editingCampaign) {
+      // Update existing campaign
+      setCampaigns(campaigns.map(c => 
+        c.id === editingCampaign.id 
+          ? { ...c, name: data.name, spend: parseFloat(data.budget) || c.spend }
+          : c
+      ));
+      setEditingCampaign(null);
+    } else {
+      // Add new campaign
+      const newCampaign = {
+        id: Math.max(...campaigns.map(c => c.id), 0) + 1,
+        name: data.name,
+        status: 'active' as const,
+        clicks: 0,
+        conversions: 0,
+        spend: parseFloat(data.budget) || 0
+      };
+      setCampaigns([...campaigns, newCampaign]);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setEditingCampaign(null);
+  };
+
   const toggleIntegration = (id: number) => {
     setIntegrations(integrations.map(i => i.id === id ? { ...i, connected: !i.connected } : i));
   };
 
   const { user, signOut } = useAuth();
-  const { getPlanLimits } = useSubscription();
+  const { getPlanLimits, subscription } = useSubscription();
   const limits = getPlanLimits();
   const connectedIntegrations = integrations.filter(i => i.connected).length;
+
+  // Check if owner mode is active
+  const isOwnerMode = subscription?.stripe_subscription_id === 'synthetic';
 
   return (
     <div className="min-h-screen bg-[#1a1a2e]">
       {/* Navigation Bar */}
       <nav className="bg-black/30 border-b border-white/10 sticky top-0 z-50 backdrop-blur-lg">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-white">TrafficPro</h1>
+          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+            TrafficPro
+            {isOwnerMode && (
+              <span className="text-xs px-2 py-1 bg-purple-600 text-white rounded-full font-normal">
+                Owner
+              </span>
+            )}
+          </h1>
           <div className="flex gap-4 items-center">
             <Link to="/" className="text-gray-300 hover:text-white transition-colors">Dashboard</Link>
             <Link to="/ab-testing" className="text-gray-300 hover:text-white transition-colors">A/B Testing</Link>
@@ -98,7 +146,9 @@ export default function AppLayout() {
 
       {/* Metrics Dashboard */}
       <div className="max-w-7xl mx-auto px-4 py-16">
-        <SubscriptionBanner />
+  {/* Success banner appears only once after Stripe redirect */}
+  <CheckoutSuccessBanner />
+  <SubscriptionBanner />
         <h2 className="text-3xl font-bold text-white mb-8">Real-Time Analytics</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
@@ -144,7 +194,7 @@ export default function AppLayout() {
               key={campaign.id}
               {...campaign}
               onToggle={() => toggleCampaign(campaign.id)}
-              onEdit={() => alert(`Editing ${campaign.name}`)}
+              onEdit={() => handleEditCampaign(campaign.id)}
             />
           ))}
         </div>
@@ -245,7 +295,12 @@ export default function AppLayout() {
         </div>
       </footer>
 
-      <CampaignModal isOpen={modalOpen} onClose={() => setModalOpen(false)} onSubmit={(data) => console.log('New campaign:', data)} />
+      <CampaignModal 
+        isOpen={modalOpen} 
+        onClose={handleCloseModal} 
+        onSubmit={handleSaveCampaign}
+        campaign={editingCampaign}
+      />
     </div>
   );
 }
