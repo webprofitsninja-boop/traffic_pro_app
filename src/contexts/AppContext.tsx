@@ -1,36 +1,22 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { toast } from '@/components/ui/use-toast';
+import React, { createContext, useContext } from 'react';
 
 interface AppContextType {
-  sidebarOpen: boolean;
-  toggleSidebar: () => void;
+  // Add any app-level state here if needed
 }
 
-const defaultAppContext: AppContextType = {
-  sidebarOpen: false,
-  toggleSidebar: () => {},
+const AppContext = createContext<AppContextType | undefined>(undefined);
+
+export const useApp = () => {
+  const context = useContext(AppContext);
+  if (!context) throw new Error('useApp must be used within AppProvider');
+  return context;
 };
 
-const AppContext = createContext<AppContextType>(defaultAppContext);
-
-export const useAppContext = () => useContext(AppContext);
-
+// Export as AppProvider to match old import name
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const value: AppContextType = {};
 
-  const toggleSidebar = () => {
-    setSidebarOpen(prev => !prev);
-  };
-
-  return (
-    <AppContext.Provider
-      value={{
-        sidebarOpen,
-        toggleSidebar,
-      }}
-    >
-      {children}
-    </AppContext.Provider>
-  );
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
+
+export const DemoAppProvider = AppProvider;

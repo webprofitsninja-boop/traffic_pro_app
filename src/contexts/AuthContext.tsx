@@ -1,10 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import type { User, Session } from '@supabase/supabase-js';
+import React, { createContext, useContext } from 'react';
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  user: { id: string; email: string } | null;
+  session: any;
   loading: boolean;
   signUp: (email: string, password: string) => Promise<any>;
   signIn: (email: string, password: string) => Promise<any>;
@@ -16,60 +14,34 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Export useAuth so components can import from either file
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) throw new Error('useAuth must be used within AuthProvider');
   return context;
 };
 
+// Also export as AuthProvider so it matches the old import name
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const signUp = async (email: string, password: string) => {
-    return await supabase.auth.signUp({ email, password });
+  // Demo user with owner email
+  const user = {
+    id: 'demo-owner-id',
+    email: 'webprofitsninja@gmail.com'
   };
 
-  const signIn = async (email: string, password: string) => {
-    return await supabase.auth.signInWithPassword({ email, password });
+  const value: AuthContextType = {
+    user,
+    session: null,
+    loading: false,
+    signUp: async () => ({ data: null, error: null }),
+    signIn: async () => ({ data: null, error: null }),
+    signOut: async () => {},
+    resetPassword: async () => ({ data: null, error: null }),
+    updateEmail: async () => ({ data: null, error: null }),
+    updatePassword: async () => ({ data: null, error: null }),
   };
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-  };
-
-  const resetPassword = async (email: string) => {
-    return await supabase.auth.resetPasswordForEmail(email);
-  };
-
-  const updateEmail = async (email: string) => {
-    return await supabase.auth.updateUser({ email });
-  };
-
-  const updatePassword = async (password: string) => {
-    return await supabase.auth.updateUser({ password });
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut, resetPassword, updateEmail, updatePassword }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+export const DemoAuthProvider = AuthProvider;
