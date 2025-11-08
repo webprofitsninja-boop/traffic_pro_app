@@ -4,8 +4,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
-import { DemoAuthProvider } from "@/contexts/DemoAuthContext";
-import { DemoAppProvider } from "@/contexts/DemoAppContext";
+import { AuthProvider } from "@/contexts/DemoAuthContext";
+import { AppProvider } from "@/contexts/DemoAppContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
@@ -27,8 +27,8 @@ const App = () => {
   return (
     <ThemeProvider defaultTheme="light">
       <QueryClientProvider client={queryClient}>
-        <DemoAuthProvider>
-          <DemoAppProvider>
+        <AuthProvider>
+          <AppProvider>
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
@@ -48,8 +48,8 @@ const App = () => {
               <Toaster />
               <Sonner />
             </BrowserRouter>
-          </DemoAppProvider>
-        </DemoAuthProvider>
+          </AppProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );

@@ -12,8 +12,11 @@ export const useApp = () => {
   return context;
 };
 
-export const DemoAppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+// Export as AppProvider to match old import name
+export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const value: AppContextType = {};
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
+
+export const DemoAppProvider = AppProvider;
