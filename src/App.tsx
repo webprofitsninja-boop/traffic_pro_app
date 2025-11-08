@@ -31,29 +31,25 @@ const App = () => {
   return (
     <ThemeProvider defaultTheme="light">
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <AppProvider>
-            <BrowserRouter>
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                <Route path="/billing" element={<ProtectedRoute><BillingPage /></ProtectedRoute>} />
-                <Route path="/analytics" element={<ProtectedRoute><CampaignAnalytics /></ProtectedRoute>} />
-                <Route path="/dashboard" element={<ProtectedRoute><AffectingDashboard /></ProtectedRoute>} />
-                <Route path="/team" element={<ProtectedRoute><TeamManagement /></ProtectedRoute>} />
-                <Route path="/permissions" element={<ProtectedRoute><PermissionsSettings /></ProtectedRoute>} />
-                <Route path="/onboarding" element={<OnboardingFlow />} />
-                <Route path="/landing" element={<LandingPage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-            <Toaster />
-            <Sonner />
-          </AppProvider>
-        </AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/billing" element={<BillingPage />} />
+            <Route path="/analytics" element={<CampaignAnalytics />} />
+            <Route path="/dashboard" element={<AffectingDashboard />} />
+            <Route path="/team" element={<TeamManagement />} />
+            <Route path="/permissions" element={<PermissionsSettings />} />
+            <Route path="/onboarding" element={<OnboardingFlow />} />
+            <Route path="/landing" element={<LandingPage />} />
+            <Route path="/login" element={<div className="min-h-screen flex items-center justify-center bg-slate-900 text-white text-xl">Demo Mode Active - <a href="/" className="text-purple-400 underline ml-2">Go to Dashboard</a></div>} />
+            <Route path="/signup" element={<div className="min-h-screen flex items-center justify-center bg-slate-900 text-white text-xl">Demo Mode Active - <a href="/" className="text-purple-400 underline ml-2">Go to Dashboard</a></div>} />
+            <Route path="/forgot-password" element={<div className="min-h-screen flex items-center justify-center bg-slate-900 text-white text-xl">Demo Mode Active - <a href="/" className="text-purple-400 underline ml-2">Go to Dashboard</a></div>} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Toaster />
+          <Sonner />
+        </BrowserRouter>
       </QueryClientProvider>
     </ThemeProvider>
   );
